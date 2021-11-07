@@ -1,19 +1,18 @@
 import praw
 import pandas
-from flask import Flask, request
+from flask import Flask, request, Response
 from prawcore import NotFound
 
 
 APP = Flask(__name__)
-reddit = praw.Reddit()
+reddit = praw.Reddit(client_id='VGrBHwVwAalrdBJ9Wqm3vw', client_secret='d6TPJWt1vNfQ9Z9ldX-NtqY7wWLXOg',
+                     user_agent='RedScrape')
 
 NOT_FOUND = {'ERROR': 'SUBREDDIT DOES NOT EXIST!'}
 VAR_ERROR = {'ERROR': 'YOUR VARIABLES ARE INCORRECT - PLEASE SEE README AT urlhere'}
 
 TIMEFRAME = ['hour', 'day', 'week', 'month', 'year', 'all']
 IMG_TAGS = ['.jpg', '.jpeg', '.png', '.gif']
-
-pandas.set_option('display.max_colwidth', 300)
 
 
 def exists(name):
@@ -67,11 +66,13 @@ def format_table(posts):
 
 @APP.route('/', methods=['GET'])
 def root():
-    return 'Hello World!'
+    with open("README.txt", "r") as file:
+        content = file.read()
+    return Response(content, mimetype='text/plain')
 
 
 @APP.route('/sub', methods=['GET'])
-def user_sub():
+def sub():
 
     name = request.args.get('subreddit')
     num = request.args.get('limit')
@@ -84,19 +85,16 @@ def user_sub():
     if not name or not num or not time:
         return VAR_ERROR
 
-    sub = reddit.subreddit(name).top(time, limit=num)
+    subreddit = reddit.subreddit(name).top(time, limit=num)
     posts = []
 
-    for post in sub:
+    for post in subreddit:
         posts.append([post.title, post.url, post.url, post.selftext])
 
     posts = format_table(posts)
-
-    print(posts)
-
     posts = pandas.DataFrame(posts, columns=['TITLE', 'URL', 'CONTENT'])
 
-    return posts.to_html(escape=False, index=False)
+    return posts.to_html(escape=False, index=False, render_links=True, justify='center', table_id='reddit_data')
 
 
 if __name__ == '__main__':
