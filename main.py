@@ -11,10 +11,9 @@ NOT_FOUND = {'ERROR': 'SUBREDDIT DOES NOT EXIST!'}
 VAR_ERROR = {'ERROR': 'YOUR VARIABLES ARE INCORRECT - PLEASE SEE README AT urlhere'}
 
 TIMEFRAME = ['hour', 'day', 'week', 'month', 'year', 'all']
+IMG_TAGS = ['.jpg', '.jpeg', '.png', '.gif']
 
-
-def subreddit(name, num):
-    pass
+pandas.set_option('display.max_colwidth', 300)
 
 
 def exists(name):
@@ -32,7 +31,7 @@ def validate_args(name, num, time):
         if exists(name):
             pass
         else:
-            name = False
+            name = NOT_FOUND
     else:
         name = False
 
@@ -50,9 +49,20 @@ def validate_args(name, num, time):
         else:
             time = False
     else:
-        pass
+        time = 'all'
 
     return name, num, time
+
+
+def format_table(posts):
+
+    for index in range(0, len(posts)):
+        if posts[index][2][-4:] in IMG_TAGS:
+            posts[index][2] = '<img src="' + posts[index][2] + '" width=300>'
+        if posts[index][3]:
+            posts[index][2] = posts[index][3]
+        del posts[index][3]
+    return posts
 
 
 @APP.route('/', methods=['GET'])
@@ -67,30 +77,26 @@ def user_sub():
     num = request.args.get('limit')
     time = request.args.get('time')
 
-    validate_args(name, num, time)
+    name, num, time = validate_args(name, num, time)
 
-    sub = reddit.subreddit(name).top
+    if name is NOT_FOUND:
+        return NOT_FOUND
+    if not name or not num or not time:
+        return VAR_ERROR
 
-
-@APP.route('/all', methods=['GET'])
-def r_all():
-
-    sub = reddit.subreddit('all').hot(limit=10)
+    sub = reddit.subreddit(name).top(time, limit=num)
     posts = []
 
     for post in sub:
-        posts.append([post.title, post.url, post.selftext])
+        posts.append([post.title, post.url, post.url, post.selftext])
 
-    posts = pandas.DataFrame(posts, columns=['TITLE', 'URL', 'BODY'])
+    posts = format_table(posts)
 
-    return posts.to_html()
+    print(posts)
 
+    posts = pandas.DataFrame(posts, columns=['TITLE', 'URL', 'CONTENT'])
 
-@APP.route('/test', methods=['GET'])
-def test():
-    var = request.args.get('var')
-    print(type(var))
-    return var
+    return posts.to_html(escape=False, index=False)
 
 
 if __name__ == '__main__':
