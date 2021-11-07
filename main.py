@@ -9,7 +9,7 @@ reddit = praw.Reddit(client_id='VGrBHwVwAalrdBJ9Wqm3vw', client_secret='d6TPJWt1
                      user_agent='RedScrape')
 
 NOT_FOUND = {'ERROR': 'SUBREDDIT DOES NOT EXIST!'}
-VAR_ERROR = {'ERROR': 'YOUR VARIABLES ARE INCORRECT - PLEASE SEE README AT https://wilkiechrisj.github.io/redscraper/'}
+VAR_ERROR = {'ERROR': 'YOUR VARIABLES ARE INCORRECT - PLEASE SEE README AT https://redscraper.uc.r.appspot.com'}
 
 TIMEFRAME = ['hour', 'day', 'week', 'month', 'year', 'all']
 IMG_TAGS = ['.jpg', '.jpeg', '.png', '.gif']
@@ -64,14 +64,14 @@ def format_table(posts):
     return posts
 
 
-@APP.route('/redscraper/', methods=['GET'])
+@APP.route('/', methods=['GET'])
 def root():
     with open("README.txt", "r") as file:
         content = file.read()
     return Response(content, mimetype='text/plain')
 
 
-@APP.route('/redscraper/sub', methods=['GET'])
+@APP.route('/sub', methods=['GET'])
 def sub():
 
     name = request.args.get('subreddit')
