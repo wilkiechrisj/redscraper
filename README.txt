@@ -3,7 +3,7 @@
 - VS 1.0 11/7/2021 -
 
 This service provides the top posts of a specified subreddit.
-Send an HTTPS request to https://redscraper.uc.r.appspot.com/sub add the following HTTP variables as necessary.
+Send an HTTPS request to http://flip3.engr.oregonstate.edu:6069/sub add the following HTTP variables as necessary.
 
 *REQUIRED*
 subreddit - The name of the subreddit (ex. 'all' or 'funny')
@@ -14,7 +14,7 @@ time - The time period where the posts should come from. Select from hour, day, 
 
 -------
 
-EXAMPLE: https://redscraper.uc.r.appspot.com/sub?subreddit=all&limit=11&time=month
+EXAMPLE: http://flip3.engr.oregonstate.edu:6069/sub?subreddit=all&limit=11&time=month
 
 This will generate a table containing the top 11 posts of the month from the subreddit r/all
 
